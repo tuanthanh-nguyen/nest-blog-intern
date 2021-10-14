@@ -6,6 +6,7 @@ import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
 import { CommentModule } from './comment/comment.module';
 import { TagModule } from './tag/tag.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { TagModule } from './tag/tag.module';
       host: 'localhost',
       port: 3306,
       username: 'root',
-      password: 'thotslayer',
+      password: 'root',
       database: 'blog',
       // entities: ["/**/**.entity{.ts,.js}"],
       autoLoadEntities: true,
@@ -24,6 +25,7 @@ import { TagModule } from './tag/tag.module';
     PostModule,
     CommentModule,
     TagModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

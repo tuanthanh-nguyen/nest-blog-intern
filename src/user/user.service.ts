@@ -24,6 +24,12 @@ export class UserService {
     return this.usersRepository.findOne(id);
   }
 
+  async findOneByUsername(username: string): Promise<User> {
+    return await this.usersRepository.findOne({
+      where: {username: username},
+    })
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const toUpdate = await this.usersRepository.findOne(id);
     const updated = Object.assign(toUpdate, updateUserDto);
