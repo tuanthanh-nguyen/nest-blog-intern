@@ -9,6 +9,7 @@ export class User {
 
   @Column({
     length: 20,
+    unique: true
   })
   username: string;
 
@@ -19,8 +20,14 @@ export class User {
 
   @Column({
     length: 40,
+    unique: true
   })
   email: string;
+
+  @Column({
+    default: false
+  })
+  isEmailVerified: boolean
 
   @OneToMany((type) => Post, (post) => post.author)
   posts: Post[];
