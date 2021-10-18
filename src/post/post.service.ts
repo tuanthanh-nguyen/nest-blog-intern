@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -11,22 +10,10 @@ export class PostService {
   constructor(
     @InjectRepository(Post)
     private postsRepository: Repository<Post>,
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
   ) {}
 
-  async create(createPostDto: CreatePostDto, author_id: string): Promise<Post> {
-    const post = Object.assign(new Post(), createPostDto);
-    const author = await this.usersRepository.findOne(author_id);
-    post.author = author;
-    return await this.postsRepository.save(post);
-  }
-
-  async findUserPost(author_id: string): Promise<Post[]> {
-    return await this.postsRepository.find({
-      where: { author: author_id },
-      relations: ['author'],
-    });
+  async create(createPostDto: CreatePostDto): Promise<Post> {
+    return await this.postsRepository.save(createPostDto);
   }
 
   findAll(): Promise<Post[]> {
@@ -37,7 +24,7 @@ export class PostService {
     return this.postsRepository.findOne(id);
   }
 
-  async update(id: string, updatePostDto: UpdatePostDto): Promise<Post> {
+  async update(id: number, updatePostDto: UpdatePostDto): Promise<Post> {
     const toUpdate = await this.postsRepository.findOne(id);
     const updated = Object.assign(toUpdate, updatePostDto);
     return await this.postsRepository.save(updated);

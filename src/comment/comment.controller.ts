@@ -22,7 +22,7 @@ export class CommentController {
     @Query('author_id') author_id: string,
     @Query('post_id') post_id: string,
   ) {
-    return this.commentService.create(createCommentDto, author_id, post_id);
+    return this.commentService.create(createCommentDto);
   }
 
   @Get()

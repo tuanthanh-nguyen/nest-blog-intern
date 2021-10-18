@@ -1,3 +1,4 @@
+import { MailerService } from '@nestjs-modules/mailer';
 import {
   OnQueueActive,
   OnQueueCompleted,
@@ -6,17 +7,14 @@ import {
   Processor,
 } from '@nestjs/bull';
 import { Logger } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { Job } from 'bull';
-import { MailService } from './mail.service';
 
 @Processor('mailsend')
 export class MailProcessor {
   private readonly logger = new Logger(this.constructor.name);
 
   constructor(
-    private readonly mailService: MailService,
-    private readonly jwtService: JwtService
+    private readonly mailersService: MailerService
     ) {}
 
   @OnQueueActive()
@@ -43,15 +41,26 @@ export class MailProcessor {
     );
   }
 
-  @Process('confirmation')
+  @Process('welcome')
   async sendWelcomeEmail(job: Job): Promise<any> {
     console.log('Processor:@Process - Sending confirmation email.');
 
     try {
-      const token = this.jwtService.sign(job.data);
-      const verify_url = `http://clickherepls.com/?token=${token}`;
-      const result = await this.mailService.sendMail(job.data.email, verify_url);
-      return result;
+    this.mailersService
+      .sendMail({
+        to: job.data.email,
+        from: process.env.MAIL_USER,
+        subject: 'Welcome Email',
+        html: `Hello sir!`, // HTML body content
+      })
+      .then(async (success) => {
+        console.log(success, 'Mail sent successfully.');
+        return success;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
     } catch (error) {
       this.logger.error('Failed to send confirmation email.', error.stack);
       throw error;

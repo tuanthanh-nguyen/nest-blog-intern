@@ -15,17 +15,9 @@ import { UpdateTagDto } from './dto/update-tag.dto';
 export class TagController {
   constructor(private readonly tagService: TagService) {}
 
-  @Post(':post_id')
-  create(
-    @Body() createTagDto: CreateTagDto,
-    @Param('post_id') post_id: string,
-  ) {
-    return this.tagService.create(createTagDto, post_id);
-  }
-
-  @Get(':id')
-  listPost(@Param('id') id: string) {
-    return this.tagService.listPost(id);
+  @Post()
+  create(@Body() createTagDto: CreateTagDto) {
+    return this.tagService.create(createTagDto);
   }
 
   @Get()

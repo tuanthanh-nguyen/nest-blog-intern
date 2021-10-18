@@ -4,8 +4,6 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { BullModule } from '@nestjs/bull';
 import { MailService } from './mail.service';
 import { MailProcessor } from './mail.processor';
-import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from 'src/mail/mail.constants';
 import { UserModule } from 'src/user/user.module';
 
 @Module({
@@ -32,10 +30,6 @@ import { UserModule } from 'src/user/user.module';
           },
         },
       }),
-    }),
-    JwtModule.register({
-      secret: jwtConstants.secret,
-      signOptions: { expiresIn: '300s' },
     }),
     BullModule.registerQueueAsync({
       name: 'mailsend', // mail queue name

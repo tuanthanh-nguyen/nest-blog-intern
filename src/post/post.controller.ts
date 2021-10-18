@@ -15,17 +15,9 @@ import { UpdatePostDto } from './dto/update-post.dto';
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
-  @Post(':author_id')
-  create(
-    @Body() createPostDto: CreatePostDto,
-    @Param('author_id') author_id: string,
-  ) {
-    return this.postService.create(createPostDto, author_id);
-  }
-
-  @Get(':author_id')
-  findUserPost(@Param('author_id') author_id: string) {
-    return this.postService.findUserPost(author_id);
+  @Post()
+  create(@Body() createPostDto: CreatePostDto) {
+    return this.postService.create(createPostDto);
   }
 
   @Get()
@@ -40,7 +32,7 @@ export class PostController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postService.update(id, updatePostDto);
+    return this.postService.update(+id, updatePostDto);
   }
 
   @Delete(':id')
