@@ -5,6 +5,9 @@
 # .env
 .env
 
+# static file
+public
+
 # Logs
 logs
 *.log

@@ -26,6 +26,9 @@ export class Post {
   })
   content: string;
 
+  @Column()
+  file: string;
+
   @CreateDateColumn({
     name: 'created_at',
     type: 'timestamp',
