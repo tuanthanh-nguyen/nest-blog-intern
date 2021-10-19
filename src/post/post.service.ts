@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
 
@@ -27,6 +27,12 @@ export class PostService {
 
   findOne(id: string): Promise<Post> {
     return this.postsRepository.findOne(id);
+  }
+
+  findByTitle(title: string) {
+    return this.postsRepository.find({
+      title: Like(`${title}`),
+    });
   }
 
   async update(id: number, updatePostDto: UpdatePostDto): Promise<Post> {
