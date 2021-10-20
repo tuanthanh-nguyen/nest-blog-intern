@@ -1,10 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Post } from '../../post/entities/post.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
+import { classToPlain, Exclude, Transform } from 'class-transformer';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
+  @Transform(({value}) => value.toString())
   id: number;
 
   @Column({
@@ -16,6 +18,7 @@ export class User {
   @Column({
     length: 20,
   })
+  @Exclude()
   password: string;
 
   @Column({
@@ -24,14 +27,28 @@ export class User {
   })
   email: string;
 
-  @Column({
-    default: false
-  })
-  isEmailVerified: boolean
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 
   @OneToMany((type) => Post, (post) => post.author)
   posts: Post[];
 
   @OneToMany((type) => Comment, (comment) => comment.author)
   comments: Comment[];
+
+  constructor(partial: Partial<User> = {}) {
+    Object.assign(this, partial);
+  }
+
+  toJSON() {
+    return classToPlain(this);
+  }
+
+  toString() {
+    return JSON.stringify(this.toJSON());
+  }
+
 }
