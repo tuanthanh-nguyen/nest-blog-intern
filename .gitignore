@@ -5,6 +5,8 @@
 # .env
 .env
 
+package-log.json
+
 # static file
 public
 
