@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { TagDto } from 'src/post/dto/create-post.dto';
+import { Post } from 'src/post/entities/post.entity';
+import { PostService } from 'src/post/post.service';
 import { Repository } from 'typeorm';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
@@ -14,6 +17,28 @@ export class TagService {
 
   async create(createTagDto: CreateTagDto): Promise<Tag> {
     return this.tagsRepository.save(createTagDto);
+  }
+
+  async getPostByTagName(name: string): Promise<Post[]> {
+    const posts = await this.tagsRepository.find({
+      where: {name: name},
+      relations: ['posts']
+    })
+    return posts.map(post => new Post(post.toJSON())); 
+  }
+
+  async findOrCreate(tags: TagDto[]): Promise<Tag[]> {
+    tags.forEach(tag => {
+      const newTag = new Tag({
+        name: tag.name,
+        description: tag.description
+      })
+      this.tagsRepository.save(newTag);
+    })
+    const getTags = await this.tagsRepository.find({
+      where: {name: tags}
+    })
+    return getTags.map(tag => new Tag(tag.toJSON()));
   }
 
   findAll() {

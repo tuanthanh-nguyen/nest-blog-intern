@@ -20,6 +20,11 @@ export class TagController {
     return this.tagService.create(createTagDto);
   }
 
+  @Get(':tag')
+  getPostByTagName(@Param('tag') tag: string ) {
+    return this.tagService.getPostByTagName(tag);
+  }
+
   @Get()
   findAll() {
     return this.tagService.findAll();

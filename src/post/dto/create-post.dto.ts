@@ -1,4 +1,25 @@
-import { IsArray, IsOptional, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsOptional, IsString } from 'class-validator';
+import { cp } from 'fs';
+
+// const transformTags = tags => {
+//   if (Array.isArray(tags)) {
+//     const tagList = [];
+//     tags.forEach(tag => tagList.push(tag.name))
+//     return tagList;
+//   } else {
+//     return tags;
+//   }
+// }
+
+const transformTags = ({value}) => {
+  if (Array.isArray(value)) {
+    return value.map(tag => {})
+  } else {
+    console.log('1')
+    return value;
+  }
+}
 
 export class CreatePostDto {
   @IsString()
@@ -7,16 +28,18 @@ export class CreatePostDto {
   @IsString()
   content: string;
 
-  @IsArray()
-  tagList: string[]
+  @IsOptional()
+  // @Transform(transformTags)
+  tags: TagDto[];
+}
+
+
+export class TagDto {
+  @IsString()
+  name: string; 
 
   @IsString()
-  @IsOptional()
-  author: string;
-
-  @IsString()
-  @IsOptional()
-  file: string;
+  description: string;
 }
 
 export interface QueryOffset {

@@ -10,6 +10,8 @@ import {
   UploadedFile,
   UseGuards,
   Query,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto, QueryProperty } from './dto/create-post.dto';
@@ -28,8 +30,9 @@ export class PostController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
+  @UsePipes(new ValidationPipe({ transform: true }))
   @UseInterceptors(FileInterceptor('file',
-      {
+      { 
         storage: diskStorage({
           destination: './public', 
           filename: (req, file, cb) => {
@@ -45,10 +48,10 @@ export class PostController {
     @UploadedFile() file: Express.Multer.File, 
     @Body() createPostDto: CreatePostDto) {
       if (file) {
-        createPostDto.file = file.filename
+        const filename = file.filename;
+        return this.postService.create(createPostDto, user, filename);
       }
-      createPostDto.author = '' + user.id;
-      return this.postService.create(createPostDto);
+      return this.postService.create(createPostDto, user);
   }
   
   @UseGuards(JwtAuthGuard)
@@ -98,13 +101,13 @@ export class PostController {
   update(
     @Param('id') id: string,
     @Body() updatePostDto: UpdatePostDto,
-    @User() user,
+    @User() user: UserEntity,
     @UploadedFile() file: Express.Multer.File) {
     if (file) {
-      updatePostDto.file = file.filename
+      const filename = file.filename;
+      return this.postService.update(+id, updatePostDto, user, filename);
     }
-    updatePostDto.author = '' + user.id;
-    return this.postService.update(+id, updatePostDto);
+    return this.postService.update(+id, updatePostDto, user);
   }
 
   @Delete(':id')

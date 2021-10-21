@@ -55,9 +55,6 @@ export class Post {
   @ManyToMany((type) => Tag, (tag) => tag.posts)
   tags: Tag[];
 
-  @Column('simple-array')
-  tagList: string[];
-
   constructor(partial: Partial<Post> = {}) {
     Object.assign(this, partial);
   }

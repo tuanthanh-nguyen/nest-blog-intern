@@ -6,6 +6,8 @@ import {
   JoinTable,
 } from 'typeorm';
 import { Post } from 'src/post/entities/post.entity';
+import { classToPlain } from 'class-transformer';
+import { text } from 'stream/consumers';
 
 @Entity()
 export class Tag {
@@ -18,7 +20,18 @@ export class Tag {
   })
   name: string;
 
+  @Column()
+  description: string;
+
   @ManyToMany((type) => Post, (post) => post.tags)
   @JoinTable()
   posts: Post[];
+
+  constructor(partial: Partial<Tag> = {}) {
+    Object.assign(this, partial);
+  }
+
+  toJSON() {
+    return classToPlain(this);
+  }
 }
