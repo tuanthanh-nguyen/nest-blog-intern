@@ -1,34 +1,66 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CommentService } from 'src/comment/comment.service';
+import { User } from 'src/user/entities/user.entity';
 import { Like, Repository } from 'typeorm';
+import { CreatePostDto, QueryProperty } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
-
-class CreatePostEntity {
-  title: string;
-  content: string;
-  file: string;
-}
+import { Comment } from 'src/comment/entities/comment.entity';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class PostService {
   constructor(
     @InjectRepository(Post)
     private postsRepository: Repository<Post>,
-  ) {}
-
-  async create(createPostEntity: CreatePostEntity): Promise<Post> {
-    return await this.postsRepository.save(createPostEntity);
+    private commentsService: CommentService,
+    private usersService: UserService
+    ) {}
+    
+  async create(createPostDto: CreatePostDto): Promise<Post> {
+    const user = await this.usersService.findOne(createPostDto.author);
+    const createPostData = Object.assign({}, createPostDto, {author: user});
+    const postToCreate = new Post(createPostData);
+    const createdPost =  await this.postsRepository.save(postToCreate);
+    return new Post(createdPost.toJSON());
+  }
+  
+  async createPostComment(createCommentDto: any, user: User, slug: string): Promise<Comment> {
+    const post = await this.postsRepository.findOne({slug: slug});
+    const createCommentData = Object.assign({}, createCommentDto, {author: user, post: post});
+    const CommentToCreate = new Comment(createCommentData);
+    const createdComment = await this.commentsService.createPostComment(CommentToCreate);
+    return new Comment(createdComment.toJSON());
   }
 
-  findAll(): Promise<Post[]> {
-    return this.postsRepository.find();
+  async getPostCommentBySlug(slug: string): Promise<Post> {
+    const post = await this.postsRepository.findOne( {
+        where : {slug: slug},
+        relations: ['comments']
+      }
+    )
+    return new Post(post.toJSON());
   }
 
-  findOne(id: string): Promise<Post> {
-    return this.postsRepository.findOne(id);
+  async getPostByQuery(query: QueryProperty): Promise<Post[]> {
+    const findOptions = { 
+      ...query,
+    }
+    const posts = await this.postsRepository.find(findOptions);
+    return posts.map(post => new Post(post.toJSON()));
   }
 
+  async findAll(): Promise<Post[]> {
+    const posts = await this.postsRepository.find({relations: ['author']});
+    return posts.map(post => new Post(post.toJSON()));
+  }
+  
+  async findOne(id: string): Promise<Post> {
+    const post = await this.postsRepository.findOne(id); 
+    return new Post(post.toJSON());
+  }
+    
   findByTitle(title: string) {
     return this.postsRepository.find({
       title: Like(`${title}`),

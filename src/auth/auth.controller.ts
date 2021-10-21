@@ -25,5 +25,4 @@ export class AuthController {
   async profile(@GetUser() user: User): Promise<User> {
     return user;
   }
-
 }

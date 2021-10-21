@@ -4,9 +4,11 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   ManyToOne,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Post } from 'src/post/entities/post.entity';
 import { User } from 'src/user/entities/user.entity';
+import { classToPlain } from 'class-transformer';
 
 @Entity()
 export class Comment {
@@ -18,15 +20,23 @@ export class Comment {
   })
   content: string;
 
-  @CreateDateColumn({
-    name: 'created_at',
-    type: 'timestamp',
-  })
-  createdAt: string;
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 
   @ManyToOne((type) => User, (user) => user.comments)
   author: User;
 
   @ManyToOne((type) => Post, (post) => post.comments)
   post: Post;
+
+  constructor(partial: Partial<Comment> = {}) {
+      Object.assign(this, partial);
+  }
+
+  toJSON() {
+    return classToPlain(this);
+  }
 }

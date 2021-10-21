@@ -10,10 +10,15 @@ export class CommentService {
   constructor(
     @InjectRepository(Comment)
     private readonly commentsRepository: Repository<Comment>,
-  ) {}
-
+    ) {}
+    
   async create(createCommentDto: CreateCommentDto) {
     return await this.commentsRepository.save(createCommentDto);
+  }
+  
+  async createPostComment(comment: Comment): Promise<Comment> {
+    const createdComment = await this.commentsRepository.save(comment);
+    return new Comment(createdComment.toJSON());
   }
 
   findAll() {

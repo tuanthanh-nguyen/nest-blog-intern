@@ -5,7 +5,7 @@
 # .env
 .env
 
-package-log.json
+package-lock.json
 
 # static file
 public

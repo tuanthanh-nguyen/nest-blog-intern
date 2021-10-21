@@ -21,7 +21,6 @@ export class AuthService {
   }
 
   async login(user: User): Promise<Object> {
-    console.log(user)
     const payload = { username: user.username, id: user.id };
     return {
       user: payload,

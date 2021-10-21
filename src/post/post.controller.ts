@@ -12,13 +12,15 @@ import {
   Query,
 } from '@nestjs/common';
 import { PostService } from './post.service';
-import { CreatePostDto } from './dto/create-post.dto';
+import { CreatePostDto, QueryProperty } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from 'src/common/decorators/user.decorator';
+import { User as UserEntity } from '../user/entities/user.entity'
+import { CreateCommentDto } from 'src/comment/dto/create-comment.dto';
 
 @Controller('post')
 export class PostController {
@@ -39,29 +41,43 @@ export class PostController {
     )
   )
   create(
-    @User() user,
+    @User() user: UserEntity,
     @UploadedFile() file: Express.Multer.File, 
     @Body() createPostDto: CreatePostDto) {
-      const filePath = {file: file.filename};
-      const authorId = {author: user.userId};
-      const createPostEntity = Object.assign({}, createPostDto, filePath, authorId);
-      return this.postService.create(createPostEntity);
+      if (file) {
+        createPostDto.file = file.filename
+      }
+      createPostDto.author = '' + user.id;
+      return this.postService.create(createPostDto);
+  }
+  
+  @UseGuards(JwtAuthGuard)
+  @Post(':slug/comments')
+  createPostComment(
+    @User() user: UserEntity,
+    @Param('slug') slug: string,
+    @Body() createCommentDto: CreateCommentDto) {
+      return this.postService.createPostComment(createCommentDto, user, slug);
+    }
+
+  @Get(':slug/comments')
+  getPostCommentBySlug(@Param('slug')slug: string) {
+    return this.postService.getPostCommentBySlug(slug);
   }
 
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.postService.findOne(id);
+  // }
+
   // @Get()
-  // findAll() {
+  // find() {
   //   return this.postService.findAll();
   // }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postService.findOne(id);
-  }
-
-  @Get()
-  findByTitle(@Query() query) {
-    console.log(query)
-    return this.postService.findByTitle(query.title);
+  @Get('feed')
+  getPostByQuery(@Query() query: QueryProperty) {
+    return this.postService.getPostByQuery(query);
   }
 
 
@@ -84,10 +100,11 @@ export class PostController {
     @Body() updatePostDto: UpdatePostDto,
     @User() user,
     @UploadedFile() file: Express.Multer.File) {
-      const filePath = { file: file.filename };
-      const authorId = { author: user.UserId};
-      const updatePostEntity = Object.assign({}, updatePostDto, filePath, authorId);
-      return this.postService.update(+id, updatePostEntity);
+    if (file) {
+      updatePostDto.file = file.filename
+    }
+    updatePostDto.author = '' + user.id;
+    return this.postService.update(+id, updatePostDto);
   }
 
   @Delete(':id')
