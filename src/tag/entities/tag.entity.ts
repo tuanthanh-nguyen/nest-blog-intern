@@ -24,7 +24,7 @@ export class Tag {
   description: string;
 
   @ManyToMany((type) => Post, (post) => post.tags)
-  @JoinTable()
+  // @JoinTable()
   posts: Post[];
 
   constructor(partial: Partial<Tag> = {}) {

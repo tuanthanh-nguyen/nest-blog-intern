@@ -20,15 +20,14 @@ export class PostService {
     private tagsService: TagService
     ) {}
     
-  async create(createPostDto: CreatePostDto, user: User, file?: string)/*: Promise<Post>*/ {
-    console.log(createPostDto.tags);
-    const author = await this.usersService.findOne(user.username);
+  async create(createPostDto: CreatePostDto, user: User, file?: string): Promise<Post>{
+    const author = await this.usersService.findOneByUsername(user.username);
     const tags = await this.tagsService.findOrCreate(createPostDto.tags);
-    console.log(tags)
     const createPostData = Object.assign({}, createPostDto, {author: author, tags: tags});
     if (file)
       createPostData[file] = file; 
     const postToCreate = new Post(createPostData);
+    console.log(postToCreate)
     const createdPost =  await this.postsRepository.save(postToCreate);
     return new Post(createdPost.toJSON());
   }
@@ -58,8 +57,15 @@ export class PostService {
     return posts.map(post => new Post(post.toJSON()));
   }
 
+  async getPostByTagName(): Promise<Post[]> {
+    const posts = await this.postsRepository.find( {
+      relations: ['tags']
+    })
+    return posts.map(post => new Post(post.toJSON()));
+  }
+
   async findAll(): Promise<Post[]> {
-    const posts = await this.postsRepository.find({relations: ['author']});
+    const posts = await this.postsRepository.find({relations: ['author', 'tags']});
     return posts.map(post => new Post(post.toJSON()));
   }
   

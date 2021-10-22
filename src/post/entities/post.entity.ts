@@ -8,6 +8,7 @@ import {
   ManyToMany,
   BeforeInsert,
   UpdateDateColumn,
+  JoinTable,
 } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
@@ -53,6 +54,7 @@ export class Post {
   comments: Comment[];
 
   @ManyToMany((type) => Tag, (tag) => tag.posts)
+  @JoinTable()
   tags: Tag[];
 
   constructor(partial: Partial<Post> = {}) {

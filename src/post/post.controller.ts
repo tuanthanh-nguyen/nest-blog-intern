@@ -73,10 +73,10 @@ export class PostController {
   //   return this.postService.findOne(id);
   // }
 
-  // @Get()
-  // find() {
-  //   return this.postService.findAll();
-  // }
+  @Get('tag')
+  find() {
+    return this.postService.findAll();
+  }
 
   @Get('feed')
   getPostByQuery(@Query() query: QueryProperty) {

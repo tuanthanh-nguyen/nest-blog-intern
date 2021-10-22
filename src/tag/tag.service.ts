@@ -3,10 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TagDto } from 'src/post/dto/create-post.dto';
 import { Post } from 'src/post/entities/post.entity';
 import { PostService } from 'src/post/post.service';
-import { Repository } from 'typeorm';
+import { createQueryBuilder, Repository } from 'typeorm';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 import { Tag } from './entities/tag.entity';
+import {getConnection} from "typeorm";
 
 @Injectable()
 export class TagService {
@@ -19,26 +20,51 @@ export class TagService {
     return this.tagsRepository.save(createTagDto);
   }
 
-  async getPostByTagName(name: string): Promise<Post[]> {
-    const posts = await this.tagsRepository.find({
+  async findOrCreate(tags: TagDto[]): Promise<Tag[]> {
+    console.log('tagsDTO')
+    console.log(tags)
+    tags.forEach(async tag => {
+      const existingTag = await this.findOneByTagName(tag.name);
+      if (existingTag)  {
+        console.log('existedTag')
+        console.log(existingTag)
+        return;
+      }
+      const newTag = new Tag({
+        name: tag.name,
+        description: tag.description,
+      })
+      console.log('newTag')
+      console.log(newTag)
+      const createdTag = await this.tagsRepository.save(newTag);
+      console.log('createdTag')
+      console.log(createdTag.toJSON())
+    })
+    const getTags = await getConnection().createQueryBuilder(Tag, "tag")
+    .where("tag.name IN (:...names)", { names: tags.map(tag => tag.name) }).getMany()
+    // const getTags = await this.tagsRepository.find({
+    //   where: {name: tags.map(tag => tag.name)}
+    // })
+    console.log('getTags')
+    console.log(getTags)
+    return getTags.map(tag => new Tag(tag.toJSON()));
+  }
+
+  async getPostByTagName(name: string): Promise<Tag> {
+    const tag = await this.tagsRepository.findOne({
       where: {name: name},
       relations: ['posts']
     })
-    return posts.map(post => new Post(post.toJSON())); 
+    return new Tag(tag.toJSON());
   }
 
-  async findOrCreate(tags: TagDto[]): Promise<Tag[]> {
-    tags.forEach(tag => {
-      const newTag = new Tag({
-        name: tag.name,
-        description: tag.description
-      })
-      this.tagsRepository.save(newTag);
-    })
-    const getTags = await this.tagsRepository.find({
-      where: {name: tags}
-    })
-    return getTags.map(tag => new Tag(tag.toJSON()));
+  async findOneByTagName(name: string): Promise<Tag> {
+    const tag = await this.tagsRepository.findOne({
+      where: {name: name},
+    });
+    if (!tag)
+      return 
+    return new Tag(tag.toJSON());
   }
 
   findAll() {
