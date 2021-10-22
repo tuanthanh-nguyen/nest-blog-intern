@@ -16,41 +16,37 @@ export class UserService {
     const userToCreate = new User(createUserDto);
     const createdUser = await this.usersRepository.save(userToCreate);
     if (createdUser) {
-        return new User(createdUser.toJSON());
+      return new User(createdUser.toJSON());
     }
   }
 
   async findAll(): Promise<User[]> {
     const users = await this.usersRepository.find();
-    if (users)
-      return users.map(user => new User(user.toJSON()));
+    if (users) return users.map((user) => new User(user.toJSON()));
   }
 
   async findOne(id: string): Promise<User> {
     const user = await this.usersRepository.findOne(id);
-    if (user)
-      return new User(user.toJSON());
+    if (user) return new User(user.toJSON());
   }
 
   async findOneByUsername(username: string): Promise<User> {
     const user = await this.usersRepository.findOne({
-      where: {username: username},
+      where: { username: username },
     });
-    if (user)
-      return new User(user.toJSON());
+    if (user) return new User(user.toJSON());
   }
 
   async findOneByEmail(email: string): Promise<User> {
     const user = await this.usersRepository.findOne({
-      where: {email: email},
+      where: { email: email },
     });
-    if (user)
-      return new User(user.toJSON());
+    if (user) return new User(user.toJSON());
   }
 
   async validateUser(username: string, password: string): Promise<User | null> {
     const user = await this.usersRepository.findOne({
-      where: {username: username},
+      where: { username: username },
     });
     if (user && user.password === password) {
       return new User(user.toJSON());

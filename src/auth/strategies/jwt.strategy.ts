@@ -2,7 +2,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { jwtConstants } from '../auth.constants';
-import { Cache } from 'cache-manager'
+import { Cache } from 'cache-manager';
 import { UserService } from 'src/user/user.service';
 import { timeStamp } from 'console';
 import { User } from 'src/user/entities/user.entity';
@@ -11,10 +11,9 @@ import { User } from 'src/user/entities/user.entity';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
-    private userService: UserService
+    private userService: UserService,
   ) {
-    super(
-      {
+    super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: jwtConstants.secret,
@@ -25,8 +24,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const userId = payload.id;
     const user = await this.cacheManager.get(userId);
     if (!user) {
-      const getUser = await this.userService.findOneByUsername(payload.username);
-      await this.cacheManager.set(userId, getUser, {ttl: 1000});
+      const getUser = await this.userService.findOneByUsername(
+        payload.username,
+      );
+      await this.cacheManager.set(userId, getUser, { ttl: 1000 });
       return getUser;
     }
     // @ts-ignore

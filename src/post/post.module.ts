@@ -8,9 +8,14 @@ import { CommentModule } from 'src/comment/comment.module';
 import { TagModule } from 'src/tag/tag.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Post]), UserModule, CommentModule, TagModule],
+  imports: [
+    TypeOrmModule.forFeature([Post]),
+    UserModule,
+    CommentModule,
+    TagModule,
+  ],
   controllers: [PostController],
   providers: [PostService],
-  exports: [PostService]
+  exports: [PostService],
 })
 export class PostModule {}

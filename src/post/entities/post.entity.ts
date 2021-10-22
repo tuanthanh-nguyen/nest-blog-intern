@@ -16,11 +16,10 @@ import { Tag } from 'src/tag/entities/tag.entity';
 import { classToPlain, Transform } from 'class-transformer';
 import * as slugify from 'slug';
 
-
 @Entity()
 export class Post {
   @PrimaryGeneratedColumn()
-  @Transform(({value}) => value.toString())
+  @Transform(({ value }) => value.toString())
   id: number;
 
   @Column()
@@ -37,7 +36,7 @@ export class Post {
   content: string;
 
   @Column({
-    nullable: true
+    nullable: true,
   })
   file: string;
 
@@ -73,4 +72,3 @@ export class Post {
     return classToPlain(this);
   }
 }
-

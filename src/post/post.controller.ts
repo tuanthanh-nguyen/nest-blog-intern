@@ -21,7 +21,7 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from 'src/common/decorators/user.decorator';
-import { User as UserEntity } from '../user/entities/user.entity'
+import { User as UserEntity } from '../user/entities/user.entity';
 import { CreateCommentDto } from 'src/comment/dto/create-comment.dto';
 import { RolesGuard } from 'src/common/role/roles.guards';
 import { Roles } from 'src/common/decorators/role.decorator';
@@ -33,40 +33,44 @@ export class PostController {
   @UseGuards(JwtAuthGuard)
   @Post()
   @UsePipes(new ValidationPipe({ transform: true }))
-  @UseInterceptors(FileInterceptor('file',
-      { 
-        storage: diskStorage({
-          destination: './public', 
-          filename: (req, file, cb) => {
-          const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
-          return cb(null, `${randomName}${extname(file.originalname)}`)
-        }
-        })
-      }
-    )
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './public',
+        filename: (req, file, cb) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join('');
+          return cb(null, `${randomName}${extname(file.originalname)}`);
+        },
+      }),
+    }),
   )
   create(
     @User() user: UserEntity,
-    @UploadedFile() file: Express.Multer.File, 
-    @Body() createPostDto: CreatePostDto) {
-      if (file) {
-        const filename = file.filename;
-        return this.postService.create(createPostDto, user, filename);
-      }
-      return this.postService.create(createPostDto, user);
+    @UploadedFile() file: Express.Multer.File,
+    @Body() createPostDto: CreatePostDto,
+  ) {
+    if (file) {
+      const filename = file.filename;
+      return this.postService.create(createPostDto, user, filename);
+    }
+    return this.postService.create(createPostDto, user);
   }
-  
+
   @UseGuards(JwtAuthGuard)
   @Post(':slug/comments')
   createPostComment(
     @User() user: UserEntity,
     @Param('slug') slug: string,
-    @Body() createCommentDto: CreateCommentDto) {
-      return this.postService.createPostComment(createCommentDto, user, slug);
-    }
+    @Body() createCommentDto: CreateCommentDto,
+  ) {
+    return this.postService.createPostComment(createCommentDto, user, slug);
+  }
 
   @Get(':slug/comments')
-  getPostCommentBySlug(@Param('slug')slug: string) {
+  getPostCommentBySlug(@Param('slug') slug: string) {
     return this.postService.getPostCommentBySlug(slug);
   }
 
@@ -85,27 +89,29 @@ export class PostController {
     return this.postService.getPostByQuery(query);
   }
 
-
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('Author')
   @Patch(':id')
-  @UseInterceptors(FileInterceptor('file',
-    {
+  @UseInterceptors(
+    FileInterceptor('file', {
       storage: diskStorage({
-        destination: './public', 
+        destination: './public',
         filename: (req, file, cb) => {
-        const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
-        return cb(null, `${randomName}${extname(file.originalname)}`)
-      }
-      })
-    }
-  )
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join('');
+          return cb(null, `${randomName}${extname(file.originalname)}`);
+        },
+      }),
+    }),
   )
   update(
     @Param('id') id: string,
     @Body() updatePostDto: UpdatePostDto,
     @User() user: UserEntity,
-    @UploadedFile() file: Express.Multer.File) {
+    @UploadedFile() file: Express.Multer.File,
+  ) {
     if (file) {
       const filename = file.filename;
       return this.postService.update(+id, updatePostDto, user, filename);

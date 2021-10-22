@@ -18,7 +18,7 @@ import * as redisStore from 'cache-manager-redis-store';
     CacheModule.register({
       store: redisStore,
       host: process.env.REDIS_HOST,
-      port: process.env.REDIS_PORT
+      port: process.env.REDIS_PORT,
     }),
     JwtModule.register({
       secret: jwtConstants.secret,

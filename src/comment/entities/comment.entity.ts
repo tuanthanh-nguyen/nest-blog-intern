@@ -33,7 +33,7 @@ export class Comment {
   post: Post;
 
   constructor(partial: Partial<Comment> = {}) {
-      Object.assign(this, partial);
+    Object.assign(this, partial);
   }
 
   toJSON() {

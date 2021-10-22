@@ -12,14 +12,14 @@ import { cp } from 'fs';
 //   }
 // }
 
-const transformTags = ({value}) => {
+const transformTags = ({ value }) => {
   if (Array.isArray(value)) {
-    return value.map(tag => {})
+    return value.map((tag) => {});
   } else {
-    console.log('1')
+    console.log('1');
     return value;
   }
-}
+};
 
 export class CreatePostDto {
   @IsString()
@@ -33,10 +33,9 @@ export class CreatePostDto {
   tags: TagDto[];
 }
 
-
 export class TagDto {
   @IsString()
-  name: string; 
+  name: string;
 
   @IsString()
   description: string;
@@ -47,6 +46,6 @@ export interface QueryOffset {
   skip?: number;
 }
 
-export interface QueryProperty extends QueryOffset  {
+export interface QueryProperty extends QueryOffset {
   author?: string;
 }

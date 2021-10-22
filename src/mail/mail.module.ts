@@ -34,10 +34,10 @@ import { UserModule } from 'src/user/user.module';
     BullModule.registerQueueAsync({
       name: 'mailsend', // mail queue name
     }),
-    UserModule
+    UserModule,
   ],
   // controllers: [MailController],
   providers: [MailService, MailProcessor],
-  exports: [MailService]
+  exports: [MailService],
 })
 export class MailModule {}

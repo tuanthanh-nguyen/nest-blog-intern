@@ -10,13 +10,12 @@ export class AuthService {
   constructor(
     private usersService: UserService,
     private jwtService: JwtService,
-    private mailsService: MailService
+    private mailsService: MailService,
   ) {}
 
   async validateUser(username: string, password: string): Promise<User | null> {
     const user = await this.usersService.validateUser(username, password);
-    if (user)
-      return user;
+    if (user) return user;
     return null;
   }
 

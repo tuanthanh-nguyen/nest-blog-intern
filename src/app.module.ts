@@ -15,7 +15,7 @@ import { join } from 'path';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true
+      isGlobal: true,
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
@@ -35,8 +35,8 @@ import { join } from 'path';
     BullModule.forRoot({
       redis: {
         name: process.env.REDIS_HOST,
-        port: Number(process.env.REDIS_PORT)
-      }
+        port: Number(process.env.REDIS_PORT),
+      },
     }),
     UserModule,
     PostModule,

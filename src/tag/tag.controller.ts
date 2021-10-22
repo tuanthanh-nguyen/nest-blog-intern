@@ -21,7 +21,7 @@ export class TagController {
   }
 
   @Get(':tag')
-  getPostByTagName(@Param('tag') tag: string ) {
+  getPostByTagName(@Param('tag') tag: string) {
     return this.tagService.getPostByTagName(tag);
   }
 

@@ -13,9 +13,7 @@ import { Job } from 'bull';
 export class MailProcessor {
   private readonly logger = new Logger(this.constructor.name);
 
-  constructor(
-    private readonly mailersService: MailerService
-    ) {}
+  constructor(private readonly mailersService: MailerService) {}
 
   @OnQueueActive()
   onActive(job: Job) {
@@ -46,21 +44,20 @@ export class MailProcessor {
     console.log('Processor:@Process - Sending confirmation email.');
 
     try {
-    this.mailersService
-      .sendMail({
-        to: job.data.email,
-        from: process.env.MAIL_USER,
-        subject: 'Welcome Email',
-        html: `Hello sir!`, // HTML body content
-      })
-      .then(async (success) => {
-        console.log(success, 'Mail sent successfully.');
-        return success;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
+      this.mailersService
+        .sendMail({
+          to: job.data.email,
+          from: process.env.MAIL_USER,
+          subject: 'Welcome Email',
+          html: `Hello sir!`, // HTML body content
+        })
+        .then(async (success) => {
+          console.log(success, 'Mail sent successfully.');
+          return success;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     } catch (error) {
       this.logger.error('Failed to send confirmation email.', error.stack);
       throw error;

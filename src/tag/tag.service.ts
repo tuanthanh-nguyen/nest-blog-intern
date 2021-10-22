@@ -7,7 +7,7 @@ import { createQueryBuilder, Repository } from 'typeorm';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 import { Tag } from './entities/tag.entity';
-import {getConnection} from "typeorm";
+import { getConnection } from 'typeorm';
 
 @Injectable()
 export class TagService {
@@ -24,36 +24,34 @@ export class TagService {
     const tagList = [];
     for (const tag of tags) {
       const existingTag = await this.findOneByTagName(tag.name);
-      if (existingTag)  {
+      if (existingTag) {
         tagList.push(new Tag(existingTag.toJSON()));
         continue;
       }
       const newTag = new Tag({
         name: tag.name,
         description: tag.description,
-      })
+      });
       const createdTag = await this.tagsRepository.save(newTag);
-      tagList.push(new Tag(createdTag.toJSON()))
+      tagList.push(new Tag(createdTag.toJSON()));
     }
     return tagList;
   }
 
   async getPostByTagName(name: string): Promise<Tag> {
     const tag = await this.tagsRepository.findOne({
-      where: {name: name},
-      relations: ['posts']
-    })
-    if (!tag)
-      return;
+      where: { name: name },
+      relations: ['posts'],
+    });
+    if (!tag) return;
     return new Tag(tag.toJSON());
   }
 
   async findOneByTagName(name: string): Promise<Tag> {
     const tag = await this.tagsRepository.findOne({
-      where: {name: name},
+      where: { name: name },
     });
-    if (!tag)
-      return 
+    if (!tag) return;
     return new Tag(tag.toJSON());
   }
 
