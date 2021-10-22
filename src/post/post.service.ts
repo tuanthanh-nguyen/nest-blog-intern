@@ -20,12 +20,12 @@ export class PostService {
     private tagsService: TagService
     ) {}
     
-  async create(createPostDto: CreatePostDto, user: User, file?: string): Promise<Post>{
+  async create(createPostDto: CreatePostDto, user: User, filePath?: string): Promise<Post>{
     const author = await this.usersService.findOneByUsername(user.username);
     const tags = await this.tagsService.findOrCreate(createPostDto.tags);
     const createPostData = Object.assign({}, createPostDto, {author: author, tags: tags});
-    if (file)
-      createPostData[file] = file; 
+    if (filePath)
+      createPostData['file'] = filePath; 
     const postToCreate = new Post(createPostData);
     console.log(postToCreate)
     const createdPost =  await this.postsRepository.save(postToCreate);
@@ -52,6 +52,7 @@ export class PostService {
   async getPostByQuery(query: QueryProperty): Promise<Post[]> {
     const findOptions = { 
       ...query,
+      relations: ['tags']
     }
     const posts = await this.postsRepository.find(findOptions);
     return posts.map(post => new Post(post.toJSON()));
