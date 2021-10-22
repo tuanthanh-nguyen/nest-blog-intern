@@ -21,33 +21,21 @@ export class TagService {
   }
 
   async findOrCreate(tags: TagDto[]): Promise<Tag[]> {
-    console.log('tagsDTO')
-    console.log(tags)
-    tags.forEach(async tag => {
+    const tagList = [];
+    for (const tag of tags) {
       const existingTag = await this.findOneByTagName(tag.name);
       if (existingTag)  {
-        console.log('existedTag')
-        console.log(existingTag)
-        return;
+        tagList.push(new Tag(existingTag.toJSON()));
+        continue;
       }
       const newTag = new Tag({
         name: tag.name,
         description: tag.description,
       })
-      console.log('newTag')
-      console.log(newTag)
       const createdTag = await this.tagsRepository.save(newTag);
-      console.log('createdTag')
-      console.log(createdTag.toJSON())
-    })
-    const getTags = await getConnection().createQueryBuilder(Tag, "tag")
-    .where("tag.name IN (:...names)", { names: tags.map(tag => tag.name) }).getMany()
-    // const getTags = await this.tagsRepository.find({
-    //   where: {name: tags.map(tag => tag.name)}
-    // })
-    console.log('getTags')
-    console.log(getTags)
-    return getTags.map(tag => new Tag(tag.toJSON()));
+      tagList.push(new Tag(createdTag.toJSON()))
+    }
+    return tagList;
   }
 
   async getPostByTagName(name: string): Promise<Tag> {
@@ -55,6 +43,8 @@ export class TagService {
       where: {name: name},
       relations: ['posts']
     })
+    if (!tag)
+      return;
     return new Tag(tag.toJSON());
   }
 

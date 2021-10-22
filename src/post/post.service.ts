@@ -3,12 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CommentService } from 'src/comment/comment.service';
 import { User } from 'src/user/entities/user.entity';
 import { Like, Repository } from 'typeorm';
-import { CreatePostDto, QueryProperty } from './dto/create-post.dto';
+import { CreatePostDto, QueryProperty, TagDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
-import { UserService } from 'src/user/user.service';
 import { TagService } from 'src/tag/tag.service';
+import { Tag } from 'src/tag/entities/tag.entity';
 
 @Injectable()
 export class PostService {
@@ -16,18 +16,15 @@ export class PostService {
     @InjectRepository(Post)
     private postsRepository: Repository<Post>,
     private commentsService: CommentService,
-    private usersService: UserService,
     private tagsService: TagService
     ) {}
     
   async create(createPostDto: CreatePostDto, user: User, filePath?: string): Promise<Post>{
-    const author = await this.usersService.findOneByUsername(user.username);
     const tags = await this.tagsService.findOrCreate(createPostDto.tags);
-    const createPostData = Object.assign({}, createPostDto, {author: author, tags: tags});
+    const createPostData = Object.assign({}, createPostDto, {author: user, tags: tags});
     if (filePath)
       createPostData['file'] = filePath; 
     const postToCreate = new Post(createPostData);
-    console.log(postToCreate)
     const createdPost =  await this.postsRepository.save(postToCreate);
     return new Post(createdPost.toJSON());
   }
@@ -43,7 +40,7 @@ export class PostService {
   async getPostCommentBySlug(slug: string): Promise<Post> {
     const post = await this.postsRepository.findOne( {
         where : {slug: slug},
-        relations: ['comments']
+        relations: ['tags', 'author', 'comments']
       }
     )
     return new Post(post.toJSON());
@@ -52,7 +49,7 @@ export class PostService {
   async getPostByQuery(query: QueryProperty): Promise<Post[]> {
     const findOptions = { 
       ...query,
-      relations: ['tags']
+      relations: ['tags', 'author', 'comments']
     }
     const posts = await this.postsRepository.find(findOptions);
     return posts.map(post => new Post(post.toJSON()));
@@ -60,7 +57,7 @@ export class PostService {
 
   async getPostByTagName(): Promise<Post[]> {
     const posts = await this.postsRepository.find( {
-      relations: ['tags']
+      relations: ['tags', 'author', 'comments']
     })
     return posts.map(post => new Post(post.toJSON()));
   }
@@ -71,7 +68,9 @@ export class PostService {
   }
   
   async findOne(id: string): Promise<Post> {
-    const post = await this.postsRepository.findOne(id); 
+    const post = await this.postsRepository.findOne(id, {
+      relations: ['author', 'tags', 'comments']
+    }); 
     return new Post(post.toJSON());
   }
     
@@ -83,15 +82,35 @@ export class PostService {
 
   async update(id: number, updatePostDto: UpdatePostDto, user: User, file?: string): Promise<Post> {
     const toUpdate = await this.postsRepository.findOne(id);
-    if (toUpdate.author.id !== user.id) {
-      throw new UnauthorizedException();
-    }
+    // if (toUpdate.author.id !== user.id) {
+    //   throw new UnauthorizedException();
+    // }
     if (file) {
       toUpdate.file = file;
     }
     const updated = Object.assign(toUpdate, updatePostDto);
     return await this.postsRepository.save(updated);
   }
+
+  async removeTag(id: number, tagToRemove: TagDto): Promise<void> {
+    const post = await this.postsRepository.findOne(id);
+    post.tags = post.tags.filter(tag => {
+      return tag.name !== tagToRemove.name;
+    })
+    await this.postsRepository.save(post);
+  }
+
+  async updateTag(id: number, tagToUpdate: TagDto, updateTo: TagDto): Promise<Post> {
+    const post = await this.postsRepository.findOne(id);
+    post.tags = post.tags.filter(tag => {
+      return tag.name !== tagToUpdate.name;
+    })
+    const newTag = new Tag(updateTo);
+    post.tags.push(newTag);
+    const updatedPost = await this.postsRepository.save(post);
+    return new Post(updatedPost.toJSON());
+  }
+
   async remove(id: string): Promise<void> {
     await this.postsRepository.delete(id);
   }

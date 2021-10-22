@@ -23,6 +23,8 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from 'src/common/decorators/user.decorator';
 import { User as UserEntity } from '../user/entities/user.entity'
 import { CreateCommentDto } from 'src/comment/dto/create-comment.dto';
+import { RolesGuard } from 'src/common/role/roles.guards';
+import { Roles } from 'src/common/decorators/role.decorator';
 
 @Controller('post')
 export class PostController {
@@ -84,7 +86,8 @@ export class PostController {
   }
 
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('Author')
   @Patch(':id')
   @UseInterceptors(FileInterceptor('file',
     {
@@ -110,7 +113,8 @@ export class PostController {
     return this.postService.update(+id, updatePostDto, user);
   }
 
-  @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('Author')
   remove(@Param('id') id: string) {
     return this.postService.remove(id);
   }

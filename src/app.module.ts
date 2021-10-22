@@ -28,7 +28,7 @@ import { join } from 'path';
       password: process.env.MYSQL_PASS,
       database: process.env.MYSQL_NAME,
       // entities: ["/**/**.entity{.ts,.js}"],
-      // dropSchema: true,
+      dropSchema: true,
       autoLoadEntities: true,
       synchronize: true,
     }),
