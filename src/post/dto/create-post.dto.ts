@@ -1,5 +1,6 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { cp } from 'fs';
 
 // const transformTags = tags => {
@@ -22,30 +23,45 @@ const transformTags = ({ value }) => {
 };
 
 export class CreatePostDto {
+  @ApiProperty()
   @IsString()
   title: string;
 
+  @ApiProperty()
   @IsString()
   content: string;
 
+  @ApiProperty({required: false})
   @IsOptional()
   // @Transform(transformTags)
   tags: TagDto[];
 }
 
 export class TagDto {
+  @ApiProperty()
   @IsString()
   name: string;
 
+  @ApiProperty()
   @IsString()
   description: string;
 }
 
-export interface QueryOffset {
+export class QueryOffset {
+  @ApiProperty({required: false})
+  @IsOptional()
+  @IsNumber()
   take?: number;
+
+  @ApiProperty({required: false})
+  @IsOptional()
+  @IsNumber()
   skip?: number;
 }
 
-export interface QueryProperty extends QueryOffset {
+export class QueryProperty extends QueryOffset {
+  @ApiProperty({required: false})
+  @IsOptional()
+  @IsString()
   author?: string;
 }

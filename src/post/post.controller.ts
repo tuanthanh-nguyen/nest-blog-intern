@@ -26,11 +26,18 @@ import { CreateCommentDto } from 'src/comment/dto/create-comment.dto';
 import { RolesGuard } from 'src/common/role/roles.guards';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { FileHelper } from 'src/common/helper/file.helper';
+import { ApiAcceptedResponse, ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('post')
 @Controller('post')
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
+  @ApiBearerAuth()
+  @ApiCreatedResponse({
+    description: 'The record has been successfully created.',
+    type: Post,
+  })
   @UseGuards(JwtAuthGuard)
   @Post()
   @UsePipes(new ValidationPipe({ transform: true }))
@@ -54,11 +61,17 @@ export class PostController {
     return this.postService.create(createPostDto, user);
   }
 
+  @ApiOkResponse({description: "list of post search by query"})
   @Get('feed')
   getPostByQuery(@Query() query: QueryProperty) {
     return this.postService.getPostByQuery(query);
   }
   
+  @ApiBearerAuth()
+  @ApiCreatedResponse({
+    description: 'The comment has been successfully created.',
+    type: Post,
+  })
   @UseGuards(JwtAuthGuard)
   @Post(':slug/comments')
   createPostComment(
@@ -69,16 +82,17 @@ export class PostController {
     return this.postService.createPostComment(createCommentDto, user, slug);
   }
 
+  @ApiOkResponse({description: "list of comment from a post"})
   @Get(':slug/comments')
   getPostCommentBySlug(@Param('slug') slug: string) {
     return this.postService.getPostCommentBySlug(slug);
   }
 
-  @Get('tag')
-  find() {
-    return this.postService.findAll();
-  }
-
+  @ApiBearerAuth()
+  @ApiAcceptedResponse({
+    description: 'update a post',
+    type: Post
+  })
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('Author')
   @Patch(':id')
@@ -103,6 +117,10 @@ export class PostController {
     return this.postService.update(+id, updatePostDto, user);
   }
 
+  @ApiBearerAuth()
+  @ApiAcceptedResponse({
+    description: 'delete a post',
+  })
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('Author')
   @Delete(':id')

@@ -35,15 +35,35 @@ export class TagService {
     return tagList;
   }
 
-  async getPostByTagName(name: string): Promise<Tag> {
-    const tag = await this.tagsRepository.findOne({
-      where: { name: name },
-      relations: ['posts'],
-    });
-    if (!tag) return;
+  /**
+   * @description: this function returns all post owned this tag 
+   * @description: each post will have author, number of comments attached
+   * @param name string
+   * @returns Promise<Tag>
+   */
+  async getPostsByTagName(name: string): Promise<Tag> {
+    const tag = await this.tagsRepository.createQueryBuilder('tag')
+                        .leftJoinAndSelect('tag.posts', 'post')
+                        .leftJoinAndSelect('post.author', 'author')
+                        .leftJoinAndSelect('post.comments', 'comment')
+                        .leftJoinAndSelect('comment.author', 'comment_owner')
+                        .where('tag.name = :name', {name: name})
+                        .getOne();
     return new Tag(tag.toJSON());
   }
 
+  /**
+   * @description: this function returns list of tags with metadata 
+   * @returns Promise<Tag[]>
+   */
+  async getListOfTags(): Promise<Tag[] | null> {
+    const tags = await this.tagsRepository.find();
+    if (tags) {
+      return tags.map(tag => new Tag(tag.toJSON()));
+    }
+    return null;
+  }
+  
   async findOneByTagName(name: string): Promise<Tag> {
     const tag = await this.tagsRepository.findOne({
       where: { name: name },
@@ -52,13 +72,9 @@ export class TagService {
     return new Tag(tag.toJSON());
   }
 
-  findAll() {
-    return this.tagsRepository.find();
-  }
-
-  findOne(id: number) {
-    return this.tagsRepository.findOne(id);
-  }
+  // findOne(id: number) {
+  //   return this.tagsRepository.findOne(id);
+  // }
 
   // async update(id: number, updateTagDto: UpdateTagDto) {
   //   const toUpdate = await this.tagsRepository.findOne(id);

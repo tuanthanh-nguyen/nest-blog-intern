@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { PostService } from './post.service';
 import { PostController } from './post.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -11,7 +11,8 @@ import { TagModule } from 'src/tag/tag.module';
   imports: [
     TypeOrmModule.forFeature([Post]),
     UserModule,
-    CommentModule,
+    forwardRef(() => CommentModule),
+    // CommentModule,
     TagModule,
   ],
   controllers: [PostController],

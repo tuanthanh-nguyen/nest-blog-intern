@@ -26,6 +26,9 @@ export class UserService {
   }
 
   async findOne(id: string): Promise<User> {
+    // const user = await this.usersRepository.findOne(id)
+    // console.log(user);
+    // return user;
     const user = await this.usersRepository.findOne(id);
     if (user) return new User(user.toJSON());
   }

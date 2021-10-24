@@ -15,43 +15,54 @@ import { Comment } from 'src/comment/entities/comment.entity';
 import { Tag } from 'src/tag/entities/tag.entity';
 import { classToPlain, Transform } from 'class-transformer';
 import * as slugify from 'slug';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
 export class Post {
+  @ApiProperty()
   @PrimaryGeneratedColumn()
   @Transform(({ value }) => value.toString())
   id: number;
 
+  @ApiProperty()
   @Column()
   slug: string;
 
+  @ApiProperty()
   @Column({
     length: 255,
   })
   title: string;
 
+  @ApiProperty()
   @Column({
     type: 'text',
   })
   content: string;
 
+  @ApiProperty()
   @Column({
     nullable: true,
   })
   file: string;
 
+  @ApiProperty()
   @CreateDateColumn()
   createdAt: Date;
 
+  @ApiProperty()
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @ApiProperty()
   @ManyToOne((type) => User, (user) => user.posts)
   author: User;
 
+  @ApiProperty()
   @OneToMany((type) => Comment, (comment) => comment.post)
   comments: Comment[];
 
+  @ApiProperty()
   @ManyToMany((type) => Tag, (tag) => tag.posts)
   @JoinTable()
   tags: Tag[];
