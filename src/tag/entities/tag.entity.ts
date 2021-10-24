@@ -4,6 +4,8 @@ import {
   PrimaryGeneratedColumn,
   ManyToMany,
   JoinTable,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Post } from 'src/post/entities/post.entity';
 import { classToPlain } from 'class-transformer';
@@ -22,6 +24,12 @@ export class Tag {
 
   @Column()
   description: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 
   @ManyToMany((type) => Post, (post) => post.tags)
   // @JoinTable()

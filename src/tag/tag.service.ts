@@ -25,13 +25,10 @@ export class TagService {
     for (const tag of tags) {
       const existingTag = await this.findOneByTagName(tag.name);
       if (existingTag) {
-        tagList.push(new Tag(existingTag.toJSON()));
+        tagList.push(existingTag);
         continue;
       }
-      const newTag = new Tag({
-        name: tag.name,
-        description: tag.description,
-      });
+      const newTag = new Tag(tag);
       const createdTag = await this.tagsRepository.save(newTag);
       tagList.push(new Tag(createdTag.toJSON()));
     }
@@ -63,13 +60,13 @@ export class TagService {
     return this.tagsRepository.findOne(id);
   }
 
-  async update(id: number, updateTagDto: UpdateTagDto) {
-    const toUpdate = await this.tagsRepository.findOne(id);
-    const updated = Object.assign(toUpdate, updateTagDto);
-    return await this.tagsRepository.save(updated);
-  }
+  // async update(id: number, updateTagDto: UpdateTagDto) {
+  //   const toUpdate = await this.tagsRepository.findOne(id);
+  //   const updated = Object.assign(toUpdate, updateTagDto);
+  //   return await this.tagsRepository.save(updated);
+  // }
 
-  async remove(id: number) {
-    await this.tagsRepository.delete(id);
-  }
+  // async remove(id: number) {
+  //   await this.tagsRepository.delete(id);
+  // }
 }

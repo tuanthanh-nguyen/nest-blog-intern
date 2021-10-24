@@ -9,6 +9,7 @@ import { Post } from './entities/post.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { TagService } from 'src/tag/tag.service';
 import { Tag } from 'src/tag/entities/tag.entity';
+import { CreateCommentDto } from 'src/comment/dto/create-comment.dto';
 
 @Injectable()
 export class PostService {
@@ -36,7 +37,7 @@ export class PostService {
   }
 
   async createPostComment(
-    createCommentDto: any,
+    createCommentDto: CreateCommentDto,
     user: User,
     slug: string,
   ): Promise<Comment> {

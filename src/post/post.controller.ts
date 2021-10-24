@@ -25,6 +25,7 @@ import { User as UserEntity } from '../user/entities/user.entity';
 import { CreateCommentDto } from 'src/comment/dto/create-comment.dto';
 import { RolesGuard } from 'src/common/role/roles.guards';
 import { Roles } from 'src/common/decorators/role.decorator';
+import { FileHelper } from 'src/common/helper/file.helper';
 
 @Controller('post')
 export class PostController {
@@ -36,14 +37,8 @@ export class PostController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './public',
-        filename: (req, file, cb) => {
-          const randomName = Array(32)
-            .fill(null)
-            .map(() => Math.round(Math.random() * 16).toString(16))
-            .join('');
-          return cb(null, `${randomName}${extname(file.originalname)}`);
-        },
+        destination: './public', //FileHelper.destinationPath,
+        filename: FileHelper.customFileName 
       }),
     }),
   )
@@ -59,6 +54,11 @@ export class PostController {
     return this.postService.create(createPostDto, user);
   }
 
+  @Get('feed')
+  getPostByQuery(@Query() query: QueryProperty) {
+    return this.postService.getPostByQuery(query);
+  }
+  
   @UseGuards(JwtAuthGuard)
   @Post(':slug/comments')
   createPostComment(
@@ -74,19 +74,9 @@ export class PostController {
     return this.postService.getPostCommentBySlug(slug);
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.postService.findOne(id);
-  // }
-
   @Get('tag')
   find() {
     return this.postService.findAll();
-  }
-
-  @Get('feed')
-  getPostByQuery(@Query() query: QueryProperty) {
-    return this.postService.getPostByQuery(query);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -95,14 +85,8 @@ export class PostController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './public',
-        filename: (req, file, cb) => {
-          const randomName = Array(32)
-            .fill(null)
-            .map(() => Math.round(Math.random() * 16).toString(16))
-            .join('');
-          return cb(null, `${randomName}${extname(file.originalname)}`);
-        },
+        destination: './public', //FileHelper.destinationPath,
+        filename: FileHelper.customFileName 
       }),
     }),
   )
@@ -121,6 +105,7 @@ export class PostController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('Author')
+  @Delete(':id')
   remove(@Param('id') id: string) {
     return this.postService.remove(id);
   }
