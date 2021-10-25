@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable, Query, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, Query, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommentService } from 'src/comment/comment.service';
 import { User } from 'src/user/entities/user.entity';
@@ -25,14 +25,22 @@ export class PostService {
   async create(
     createPostDto: CreatePostDto,
     user: User,
-    filePath?: string,
+    file?: Express.Multer.File,
     ): Promise<Post> {
-    const tags = await this.tagsService.findOrCreate(createPostDto.tags);
     const createPostData = Object.assign({}, createPostDto, {
       author: user,
-      tags: tags,
     });
-    if (filePath) createPostData['file'] = filePath;
+    if (createPostDto.tags) {
+      const tags = await this.tagsService.findOrCreate(createPostDto.tags);
+      createPostData['tags'] = tags;
+    }
+    else createPostData['tags'] = await this.tagsService
+        .findOrCreate([{
+          name: 'default-tag',
+          description: 'defaulted'
+        }]);
+    if (file) createPostData['file'] = file.filename;
+    // @ts-ignore
     const postToCreate = new Post(createPostData);
     const createdPost = await this.postsRepository.save(postToCreate);
     return new Post(createdPost.toJSON());
@@ -134,14 +142,14 @@ export class PostService {
     id: number,
     updatePostDto: UpdatePostDto,
     user: User,
-    file?: string,
+    file?: Express.Multer.File,
   ): Promise<Post> {
     const toUpdate = await this.postsRepository.findOne(id);
     // if (toUpdate.author.id !== user.id) {
     //   throw new UnauthorizedException();
     // }
     if (file) {
-      toUpdate.file = file;
+      toUpdate.file = file.filename;
     }
     const updated = Object.assign(toUpdate, updatePostDto);
     return await this.postsRepository.save(updated);

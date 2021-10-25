@@ -14,7 +14,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { PostService } from './post.service';
-import { CreatePostDto, QueryPostProperty } from './dto/create-post.dto';
+import { CreatePostDto, CreatePostDtoSwaggerBody, QueryPostProperty } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -26,17 +26,23 @@ import { CreateCommentDto } from 'src/comment/dto/create-comment.dto';
 import { RolesGuard } from 'src/common/role/roles.guards';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { FileHelper } from 'src/common/helper/file.helper';
-import { ApiAcceptedResponse, ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiAcceptedResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('post')
 @Controller('post')
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
-  @ApiBearerAuth()
+  @ApiBearerAuth('access_token')
+  @ApiOperation({summary: 'create a post'})
   @ApiCreatedResponse({
     description: 'The record has been successfully created.',
     type: Post,
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'file upload',
+    type: CreatePostDtoSwaggerBody,
   })
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -54,20 +60,18 @@ export class PostController {
     @UploadedFile() file: Express.Multer.File,
     @Body() createPostDto: CreatePostDto,
   ) {
-    if (file) {
-      const filename = file.filename;
-      return this.postService.create(createPostDto, user, filename);
-    }
-    return this.postService.create(createPostDto, user);
+    return this.postService.create(createPostDto, user, file);
   }
 
   @ApiOkResponse({description: "list of post search by query"})
-  @Get('feed')
+  @ApiOperation({summary: 'get posts by with query'})
+  @Get('query')
   getPostByQuery(@Query() query: QueryPostProperty) {
     return this.postService.getPostByQuery(query);
   }
   
-  @ApiBearerAuth()
+  @ApiBearerAuth('access_token')
+  @ApiOperation({summary: 'comment to a post'})
   @ApiCreatedResponse({
     description: 'The comment has been successfully created.',
     type: Post,
@@ -82,15 +86,17 @@ export class PostController {
     return this.postService.createPostComment(createCommentDto, user, slug);
   }
 
+  @ApiOperation({summary: 'get all comments from a post'})
   @ApiOkResponse({description: "list of comment from a post"})
   @Get(':slug/comments')
   getPostCommentBySlug(@Param('slug') slug: string) {
     return this.postService.getPostCommentBySlug(slug);
   }
 
-  @ApiBearerAuth()
+  @ApiOperation({summary: 'update a post'})
+  @ApiBearerAuth('access_token')
   @ApiAcceptedResponse({
-    description: 'update a post',
+    description: 'post updated successfully',
     type: Post
   })
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -110,16 +116,13 @@ export class PostController {
     @User() user: UserEntity,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    if (file) {
-      const filename = file.filename;
-      return this.postService.update(+id, updatePostDto, user, filename);
-    }
-    return this.postService.update(+id, updatePostDto, user);
+    return this.postService.update(+id, updatePostDto, user, file);
   }
 
-  @ApiBearerAuth()
+  @ApiOperation({summary: 'delete a post'})
+  @ApiBearerAuth('access_token')
   @ApiAcceptedResponse({
-    description: 'delete a post',
+    description: 'post deleted successfully',
   })
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('Author')

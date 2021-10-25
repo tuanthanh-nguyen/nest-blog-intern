@@ -17,7 +17,8 @@ export class TagService {
   ) {}
 
   async create(createTagDto: CreateTagDto): Promise<Tag> {
-    return this.tagsRepository.save(createTagDto);
+    const tag = await this.tagsRepository.save(createTagDto);
+    return new Tag(tag.toJSON());
   }
 
   async findOrCreate(tags: TagDto[]): Promise<Tag[]> {

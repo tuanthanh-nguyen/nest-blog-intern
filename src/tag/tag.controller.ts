@@ -10,33 +10,37 @@ import {
 import { TagService } from './tag.service';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('tag')
 @Controller('tag')
 export class TagController {
   constructor(private readonly tagService: TagService) {}
-  
-  @ApiOkResponse({description: 'return list of posts owned this tag'})
-  @Get(':tag')
-  getPostsByTagName(@Param('tag') tag: string) {
+
+  @ApiOperation({summary: 'get all posts from a tag'})
+  @ApiOkResponse({description: 'posts returned successfully'})
+  @Get(':name')
+  getPostsByTagName(@Param('name') tag: string) {
     return this.tagService.getPostsByTagName(tag);
   }
 
-  @ApiOkResponse({description: 'return list of tags'})
+  @ApiOperation({summary: 'get all tags from database'})
+  @ApiOkResponse({description: 'tags returned successfully'})
   @Get()
   getListOfTags() {
     return this.tagService.getListOfTags();
   }
-
+  
+  @ApiOperation({summary: 'create tag'})
+  @ApiCreatedResponse({description: 'tag created succesfullt'})
+  @Post()
+  create(@Body() createTagDto: CreateTagDto) {
+    return this.tagService.create(createTagDto);
+  }
+  
   // @Get(':id')
   // findOne(@Param('id') id: string) {
   //   return this.tagService.findOne(+id);
-  // }
-  
-  // @Post()
-  // create(@Body() createTagDto: CreateTagDto) {
-  //   return this.tagService.create(createTagDto);
   // }
 
   // @Patch(':id')

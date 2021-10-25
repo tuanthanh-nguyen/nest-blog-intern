@@ -44,9 +44,29 @@ export class TagDto {
   @IsString()
   name: string;
 
+  @ApiProperty({required: false})
+  @IsString()
+  @IsOptional()
+  description: string;
+}
+
+export class CreatePostDtoSwaggerBody {
   @ApiProperty()
   @IsString()
-  description: string;
+  title: string;
+
+  @ApiProperty()
+  @IsString()
+  content: string;
+
+  @ApiProperty({required: false})
+  @IsOptional()
+  // @Transform(transformTags)
+  tags: TagDto[];
+
+  @ApiProperty({ type: 'string', format: 'binary', required: false })
+  @IsOptional() 
+  file: any;
 }
 
 export class QueryCommon {

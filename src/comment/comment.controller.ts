@@ -17,11 +17,11 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
-  @ApiOkResponse({description: 'get list comment from post with author'})
-  @Get('post/:slug')
-  getPostComment(@Param('slug') slug: string) {
-    return this.commentService.getPostComment(slug);
-  }
+  // @ApiOkResponse({description: 'get list comment from post with author'})
+  // @Get('post/:slug')
+  // getPostComment(@Param('slug') slug: string) {
+  //   return this.commentService.getPostComment(slug);
+  // }
 
   // @Get()
   // findAll() {

@@ -11,6 +11,11 @@ async function bootstrap() {
     .setDescription('The blogs API description')
     .setVersion('1.0')
     .addTag('blogs')
+    .addBearerAuth({
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT'
+    }, 'access_token')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

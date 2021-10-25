@@ -26,7 +26,9 @@ export class Tag {
   name: string;
 
   @ApiProperty()
-  @Column()
+  @Column({
+    nullable: true,
+  })
   description: string;
 
   @ApiProperty()
