@@ -1,15 +1,16 @@
-import { forwardRef, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Query, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommentService } from 'src/comment/comment.service';
 import { User } from 'src/user/entities/user.entity';
-import { Like, Repository } from 'typeorm';
-import { CreatePostDto, QueryProperty, TagDto } from './dto/create-post.dto';
+import { LessThan, Like, MoreThan, Repository } from 'typeorm';
+import { CreatePostDto, QueryPostProperty, TagDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { TagService } from 'src/tag/tag.service';
 import { Tag } from 'src/tag/entities/tag.entity';
 import { CreateCommentDto } from 'src/comment/dto/create-comment.dto';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class PostService {
@@ -76,12 +77,22 @@ export class PostService {
     return new Post(post.toJSON());
   }
   
-  async getPostByQuery(query: QueryProperty): Promise<Post[]> {
+  /**
+   * @description: this function returns list of posts filter with query options 
+   * @param query 
+   * @returns Promise 
+   */
+  async getPostByQuery(query: QueryPostProperty): Promise<Post[]> {
     const findOptions = {
-      ...query,
+      ...plainToClass(QueryPostProperty, query).getQueryPostObject(),
       relations: ['tags', 'author', 'comments'],
     };
     const posts = await this.postsRepository.find(findOptions);
+    // const posts = await this.postsRepository.createQueryBuilder('post')
+    //                   .leftJoinAndSelect('post.comments', 'comment')
+    //                   .leftJoinAndSelect('post.author', 'post_author')
+    //                   .leftJoinAndSelect('comment.author', 'comment.author')
+    //                   .getMany();
     return posts.map((post) => new Post(post.toJSON()));
   }
   

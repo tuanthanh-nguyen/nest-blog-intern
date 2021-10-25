@@ -14,7 +14,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { PostService } from './post.service';
-import { CreatePostDto, QueryProperty } from './dto/create-post.dto';
+import { CreatePostDto, QueryPostProperty } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -63,7 +63,7 @@ export class PostController {
 
   @ApiOkResponse({description: "list of post search by query"})
   @Get('feed')
-  getPostByQuery(@Query() query: QueryProperty) {
+  getPostByQuery(@Query() query: QueryPostProperty) {
     return this.postService.getPostByQuery(query);
   }
   
