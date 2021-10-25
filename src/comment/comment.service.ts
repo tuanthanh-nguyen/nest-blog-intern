@@ -12,25 +12,25 @@ export class CommentService {
     @InjectRepository(Comment)
     private readonly commentsRepository: Repository<Comment>,
     @Inject(forwardRef(() => PostService))
-    private readonly postsService: PostService
+    private readonly postsService: PostService,
   ) {}
-  
+
   async create(createCommentDto: CreateCommentDto) {
     return await this.commentsRepository.save(createCommentDto);
   }
-  
+
   async createPostComment(comment: Comment): Promise<Comment> {
     const createdComment = await this.commentsRepository.save(comment);
     return new Comment(createdComment.toJSON());
   }
-  
+
   async getPostComment(slug: string): Promise<Comment[]> {
     const post = this.postsService.findPostBySlug(slug);
     const comments = await this.commentsRepository.find({
-      where: {post: post},
-      relations: ['author']
-    })
-    return comments.map(comment => new Comment(comment.toJSON()));
+      where: { post: post },
+      relations: ['author'],
+    });
+    return comments.map((comment) => new Comment(comment.toJSON()));
   }
 
   findAll() {

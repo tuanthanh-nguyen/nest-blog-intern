@@ -8,7 +8,7 @@ import { PostModule } from 'src/post/post.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Comment]),
-    forwardRef(() => PostModule)
+    forwardRef(() => PostModule),
     // PostModule
   ],
   controllers: [CommentController],

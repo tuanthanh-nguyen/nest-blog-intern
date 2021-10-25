@@ -10,7 +10,7 @@ import { Post } from '../../post/entities/post.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { classToPlain, Exclude, Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 
 @Entity()
 export class User {

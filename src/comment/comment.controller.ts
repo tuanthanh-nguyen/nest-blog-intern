@@ -1,17 +1,5 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Query,
-} from '@nestjs/common';
-import { ApiOkResponse } from '@nestjs/swagger';
+import { Controller } from '@nestjs/common';
 import { CommentService } from './comment.service';
-import { CreateCommentDto } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @Controller('comment')
 export class CommentController {
@@ -32,7 +20,7 @@ export class CommentController {
   // findOne(@Param('id') id: string) {
   //   return this.commentService.findOne(+id);
   // }
-  
+
   // @Post()
   // create(@Body() createCommentDto: CreateCommentDto) {
   //   return this.commentService.create(createCommentDto);

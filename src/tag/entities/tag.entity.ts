@@ -3,13 +3,11 @@ import {
   Column,
   PrimaryGeneratedColumn,
   ManyToMany,
-  JoinTable,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Post } from 'src/post/entities/post.entity';
 import { classToPlain } from 'class-transformer';
-import { text } from 'stream/consumers';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
