@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CommentService } from 'src/comment/comment.service';
+import { CommentService } from 'src/post/comment.service';
 import { User } from 'src/user/entities/user.entity';
 import { Like, Repository } from 'typeorm';
 import {
@@ -10,10 +10,10 @@ import {
 } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
-import { Comment } from 'src/comment/entities/comment.entity';
+import { Comment } from './entities/comment.entity';
 import { TagService } from 'src/tag/tag.service';
 import { Tag } from 'src/tag/entities/tag.entity';
-import { CreateCommentDto } from 'src/comment/dto/create-comment.dto';
+import { CreateCommentDto } from 'src/post/dto/create-comment.dto';
 import { plainToClass } from 'class-transformer';
 
 @Injectable()
@@ -162,7 +162,7 @@ export class PostService {
   }
 
   async removeTag(id: number, tagToRemove: TagDto): Promise<void> {
-    const post = await this.postsRepository.findOne(id);
+    const post = await this.postsRepository.findOne(id, {relations: ['tags']});
     post.tags = post.tags.filter((tag) => {
       return tag.name !== tagToRemove.name;
     });
@@ -174,12 +174,12 @@ export class PostService {
     tagToUpdate: TagDto,
     updateTo: TagDto,
   ): Promise<Post> {
-    const post = await this.postsRepository.findOne(id);
+    const post = await this.postsRepository.findOne(id, {relations: ["tags"]});
     post.tags = post.tags.filter((tag) => {
       return tag.name !== tagToUpdate.name;
     });
-    const newTag = new Tag(updateTo);
-    post.tags.push(newTag);
+    const newTag = await this.tagsService.findOrCreate([updateTo]);
+    post.tags.push(...newTag);
     const updatedPost = await this.postsRepository.save(post);
     return new Post(updatedPost.toJSON());
   }

@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Post } from '../../post/entities/post.entity';
-import { Comment } from 'src/comment/entities/comment.entity';
+import { Comment } from 'src/post/entities/comment.entity';
 import { classToPlain, Exclude, Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';

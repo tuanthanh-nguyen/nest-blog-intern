@@ -83,17 +83,11 @@ export class QueryCommon {
 
   getQueryCommonObject() {
     const options = {};
-    if (this.limit) options['take'] = this.limit;
-    if (this.offset) options['skip'] = this.offset;
-    if (this.sortType) {
-      let type: any;
-      if (this.sortType === 1) type = 'ASC';
-      else type = 'DESC';
-      const sortObject = {
-        [this.sortField || 'id']: type,
-      };
-      options['order'] = sortObject;
+    if (this.limit && this.offset){
+      options['take'] = this.limit;
+      options['skip'] = this.offset;
     }
+    options['order'] = { [this.sortField || 'id']: this.sortType || 'DESC' }
     return options;
   }
 }

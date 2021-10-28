@@ -11,7 +11,7 @@ import {
   JoinTable,
 } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
-import { Comment } from 'src/comment/entities/comment.entity';
+import { Comment } from '../entities/comment.entity';
 import { Tag } from 'src/tag/entities/tag.entity';
 import { classToPlain, Transform } from 'class-transformer';
 import * as slugify from 'slug';
@@ -64,7 +64,17 @@ export class Post {
 
   @ApiProperty()
   @ManyToMany((type) => Tag, (tag) => tag.posts)
-  @JoinTable()
+  @JoinTable({
+    name: "post_tags", // table name for the junction table of this relation
+    joinColumn: {
+        name: "post",
+        referencedColumnName: "id"
+    },
+    inverseJoinColumn: {
+        name: "tag",
+        referencedColumnName: "id"
+    }
+  })
   tags: Tag[];
 
   constructor(partial: Partial<Post> = {}) {

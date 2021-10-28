@@ -18,6 +18,7 @@ import {
   CreatePostDto,
   CreatePostDtoSwaggerBody,
   QueryPostProperty,
+  TagDto,
 } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -25,7 +26,7 @@ import { diskStorage } from 'multer';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from 'src/common/decorators/user.decorator';
 import { User as UserEntity } from '../user/entities/user.entity';
-import { CreateCommentDto } from 'src/comment/dto/create-comment.dto';
+import { CreateCommentDto } from './dto/create-comment.dto';
 import { RolesGuard } from 'src/common/role/roles.guards';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { FileHelper } from 'src/common/helper/file.helper';
@@ -39,6 +40,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { UpdateTagDto } from 'src/tag/dto/update-tag.dto';
 
 @ApiTags('post')
 @Controller('post')
@@ -141,5 +143,15 @@ export class PostController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.postService.remove(id);
+  }
+
+  @Patch(':id/tag/update')
+  updateTag(@Param('id') id: string, @Body('tagToUpdate') tagToUpdate: TagDto, @Body('toUpdate') updateTo: TagDto) {
+    return this.postService.updateTag(+id, tagToUpdate, updateTo); 
+  }
+
+  @Delete(':id/tag/delete')
+  removeTag(@Param('id') id: string, @Body() tag: TagDto) {
+    return this.postService.removeTag(+id, tag);
   }
 }
