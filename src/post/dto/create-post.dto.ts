@@ -1,6 +1,8 @@
+import { Post } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { plainToClass, Transform, Type } from 'class-transformer';
 import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { LessThan, MoreThan, Raw } from 'typeorm';
 
 export class CreatePostDto {
   @ApiProperty()
@@ -81,14 +83,16 @@ export class QueryCommon {
   @IsNumber()
   sortType: number;
 
-  getQueryCommonObject() {
+  getQueryCommonObject(): QueryCommon {
     const options = {};
+    // if (this.fromDate) options['createdAt'] = MoreThan(this.fromDate)
+    // if (this.toDate) options['createdAt'] = LessThan(this.toDate)
     if (this.limit && this.offset){
       options['take'] = this.limit;
       options['skip'] = this.offset;
     }
     options['order'] = { [this.sortField || 'id']: this.sortType || 'DESC' }
-    return options;
+    return plainToClass(QueryCommon, options);
   }
 }
 
@@ -103,11 +107,13 @@ export class QueryPostProperty extends QueryCommon {
   @IsString()
   title?: string;
 
-  getQueryPostObject() {
-    const commonQueryObject = this.getQueryCommonObject();
+  getQueryPostObject(): QueryPostProperty {
     const postQueryObject = {};
+    if (this.fromDate) postQueryObject['createdAt'] = MoreThan(this.fromDate);
+    if (this.toDate) postQueryObject['createdAt'] = LessThan(this.toDate);
     if (this.author) postQueryObject['author'] = this.author;
     if (this.title) postQueryObject['title'] = this.title;
-    return Object.assign({}, commonQueryObject, { where: postQueryObject });
+    const queryOptions =  Object.assign({}, this.getQueryCommonObject(), {where: postQueryObject});
+    return plainToClass(QueryPostProperty, queryOptions);
   }
 }
