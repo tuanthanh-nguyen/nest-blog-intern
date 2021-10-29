@@ -101,13 +101,14 @@ export class PostService {
       ...plainToClass(QueryPostProperty, query).getQueryPostObject(),
       relations: ['tags', 'author', 'comments'],
     };
-    const commentsCount = await this.postsRepository.createQueryBuilder('post')
-                                                    .select('post.id', 'id')
-                                                    .leftJoin('post.comments', 'post_comment')
-                                                    .addSelect('Count(post_comment.id)', 'count')
-                                                    .groupBy("id")
-                                                    .getRawMany();
-    console.log(commentsCount)
+    const commentsCount = await this.postsRepository
+      .createQueryBuilder('post')
+      .select('post.id', 'id')
+      .leftJoin('post.comments', 'post_comment')
+      .addSelect('Count(post_comment.id)', 'count')
+      .groupBy('id')
+      .getRawMany();
+    console.log(commentsCount);
     const posts = await this.postsRepository.find(findOptions);
     return posts.map((post) => new Post(post.toJSON()));
   }
@@ -164,7 +165,9 @@ export class PostService {
   }
 
   async removeTag(id: number, tagToRemove: TagDto): Promise<void> {
-    const post = await this.postsRepository.findOne(id, {relations: ['tags']});
+    const post = await this.postsRepository.findOne(id, {
+      relations: ['tags'],
+    });
     post.tags = post.tags.filter((tag) => {
       return tag.name !== tagToRemove.name;
     });
@@ -176,7 +179,9 @@ export class PostService {
     tagToUpdate: TagDto,
     updateTo: TagDto,
   ): Promise<Post> {
-    const post = await this.postsRepository.findOne(id, {relations: ["tags"]});
+    const post = await this.postsRepository.findOne(id, {
+      relations: ['tags'],
+    });
     post.tags = post.tags.filter((tag) => {
       return tag.name !== tagToUpdate.name;
     });

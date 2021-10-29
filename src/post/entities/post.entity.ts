@@ -65,15 +65,15 @@ export class Post {
   @ApiProperty()
   @ManyToMany((type) => Tag, (tag) => tag.posts)
   @JoinTable({
-    name: "post_tags", // table name for the junction table of this relation
+    name: 'post_tags', // table name for the junction table of this relation
     joinColumn: {
-        name: "post",
-        referencedColumnName: "id"
+      name: 'post',
+      referencedColumnName: 'id',
     },
     inverseJoinColumn: {
-        name: "tag",
-        referencedColumnName: "id"
-    }
+      name: 'tag',
+      referencedColumnName: 'id',
+    },
   })
   tags: Tag[];
 

@@ -87,11 +87,11 @@ export class QueryCommon {
     const options = {};
     // if (this.fromDate) options['createdAt'] = MoreThan(this.fromDate)
     // if (this.toDate) options['createdAt'] = LessThan(this.toDate)
-    if (this.limit && this.offset){
+    if (this.limit && this.offset) {
       options['take'] = this.limit;
       options['skip'] = this.offset;
     }
-    options['order'] = { [this.sortField || 'id']: this.sortType || 'DESC' }
+    options['order'] = { [this.sortField || 'id']: this.sortType || 'DESC' };
     return plainToClass(QueryCommon, options);
   }
 }
@@ -113,7 +113,9 @@ export class QueryPostProperty extends QueryCommon {
     if (this.toDate) postQueryObject['createdAt'] = LessThan(this.toDate);
     if (this.author) postQueryObject['author'] = this.author;
     if (this.title) postQueryObject['title'] = this.title;
-    const queryOptions =  Object.assign({}, this.getQueryCommonObject(), {where: postQueryObject});
+    const queryOptions = Object.assign({}, this.getQueryCommonObject(), {
+      where: postQueryObject,
+    });
     return plainToClass(QueryPostProperty, queryOptions);
   }
 }

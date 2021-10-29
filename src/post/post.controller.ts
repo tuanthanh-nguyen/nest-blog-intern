@@ -146,8 +146,12 @@ export class PostController {
   }
 
   @Patch(':id/tag/update')
-  updateTag(@Param('id') id: string, @Body('tagToUpdate') tagToUpdate: TagDto, @Body('toUpdate') updateTo: TagDto) {
-    return this.postService.updateTag(+id, tagToUpdate, updateTo); 
+  updateTag(
+    @Param('id') id: string,
+    @Body('tagToUpdate') tagToUpdate: TagDto,
+    @Body('toUpdate') updateTo: TagDto,
+  ) {
+    return this.postService.updateTag(+id, tagToUpdate, updateTo);
   }
 
   @Delete(':id/tag/delete')

@@ -36,7 +36,10 @@ export class TagController {
   }
 
   @Patch(':name')
-  updateTagByName(@Param('name') name: string, @Body() updateTagDto: UpdateTagDto) {
+  updateTagByName(
+    @Param('name') name: string,
+    @Body() updateTagDto: UpdateTagDto,
+  ) {
     return this.tagService.updateTagByName(name, updateTagDto);
   }
 }

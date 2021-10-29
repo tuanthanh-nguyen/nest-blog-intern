@@ -1,4 +1,9 @@
-import { assignMetadata, BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  assignMetadata,
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { assert } from 'console';
 import { NotFoundError } from 'rxjs';
@@ -13,12 +18,12 @@ export class TagService {
   constructor(
     @InjectRepository(Tag)
     private readonly tagsRepository: Repository<Tag>,
-    ) {}
-    
-    async create(createTagDto: CreateTagDto): Promise<Tag> {
-      const newTag = new Tag(createTagDto);
-      const tag = await this.tagsRepository.save(newTag);
-      if (!tag) throw new BadRequestException();
+  ) {}
+
+  async create(createTagDto: CreateTagDto): Promise<Tag> {
+    const newTag = new Tag(createTagDto);
+    const tag = await this.tagsRepository.save(newTag);
+    if (!tag) throw new BadRequestException();
     return tag;
   }
 
@@ -35,7 +40,7 @@ export class TagService {
     }
     return tagList;
   }
-  
+
   /**
    * @description: this function returns all post owned this tag
    * @description: each post will have author, number of comments attached
@@ -44,17 +49,17 @@ export class TagService {
    */
   async getPostsByTagName(name: string): Promise<Tag> {
     const tag = await this.tagsRepository
-    .createQueryBuilder('tag')
-    .leftJoinAndSelect('tag.posts', 'post')
-    .leftJoinAndSelect('post.author', 'author')
-    .leftJoinAndSelect('post.comments', 'comment')
-    .leftJoinAndSelect('comment.author', 'comment_owner')
-    .where('tag.name = :name', { name: name })
-    .getOne();
+      .createQueryBuilder('tag')
+      .leftJoinAndSelect('tag.posts', 'post')
+      .leftJoinAndSelect('post.author', 'author')
+      .leftJoinAndSelect('post.comments', 'comment')
+      .leftJoinAndSelect('comment.author', 'comment_owner')
+      .where('tag.name = :name', { name: name })
+      .getOne();
     if (!tag) throw new NotFoundException();
     return new Tag(tag.toJSON());
   }
-  
+
   /**
    * @description: this function returns list of tags with metadata
    * @returns Promise<Tag[]>
@@ -66,7 +71,7 @@ export class TagService {
     }
     return null;
   }
-  
+
   async findOneByTagName(name: string): Promise<Tag> {
     const tag = await this.tagsRepository.findOne({
       where: { name: name },
@@ -75,7 +80,10 @@ export class TagService {
     return new Tag(tag.toJSON());
   }
 
-  async updateTagByName(name: string, updateTagDto: UpdateTagDto): Promise<Tag> {
+  async updateTagByName(
+    name: string,
+    updateTagDto: UpdateTagDto,
+  ): Promise<Tag> {
     let tagToUpdate = await this.findOneByTagName(name);
     Object.assign(tagToUpdate, updateTagDto);
     await this.tagsRepository.save(tagToUpdate);

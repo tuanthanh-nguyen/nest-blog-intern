@@ -9,11 +9,7 @@ import { TagModule } from 'src/tag/tag.module';
 import { CommentService } from './comment.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Post, Comment]),
-    UserModule,
-    TagModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Post, Comment]), UserModule, TagModule],
   controllers: [PostController],
   providers: [PostService, CommentService],
   exports: [PostService],
