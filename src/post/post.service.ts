@@ -101,12 +101,14 @@ export class PostService {
       ...plainToClass(QueryPostProperty, query).getQueryPostObject(),
       relations: ['tags', 'author', 'comments'],
     };
+    const commentsCount = await this.postsRepository.createQueryBuilder('post')
+                                                    .select('post.id', 'id')
+                                                    .leftJoin('post.comments', 'post_comment')
+                                                    .addSelect('Count(post_comment.id)', 'count')
+                                                    .groupBy("id")
+                                                    .getRawMany();
+    console.log(commentsCount)
     const posts = await this.postsRepository.find(findOptions);
-    // const posts = await this.postsRepository.createQueryBuilder('post')
-    //                   .leftJoinAndSelect('post.comments', 'comment')
-    //                   .leftJoinAndSelect('post.author', 'post_author')
-    //                   .leftJoinAndSelect('comment.author', 'comment.author')
-    //                   .getMany();
     return posts.map((post) => new Post(post.toJSON()));
   }
 
