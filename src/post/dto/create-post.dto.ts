@@ -4,20 +4,6 @@ import { plainToClass, Transform, Type } from 'class-transformer';
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { LessThan, MoreThan, Raw } from 'typeorm';
 
-export class CreatePostDto {
-  @ApiProperty()
-  @IsString()
-  title: string;
-
-  @ApiProperty()
-  @IsString()
-  content: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  tags: TagDto[];
-}
-
 export class TagDto {
   @ApiProperty()
   @IsString()
@@ -28,6 +14,33 @@ export class TagDto {
   @IsOptional()
   description: string;
 }
+export class CreatePostDto {
+  @ApiProperty()
+  @IsString()
+  title: string;
+
+  @ApiProperty()
+  @IsString()
+  content: string;
+
+  @ApiProperty({ 
+    type:'array',
+    items: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+        },
+        description: {
+          type: 'string',
+        },
+      }
+    }
+  })
+  @IsOptional()
+  tags: TagDto[];
+}
+
 
 export class CreatePostDtoSwaggerBody {
   @ApiProperty()
@@ -107,10 +120,10 @@ export class QueryPostProperty extends QueryCommon {
   @IsString()
   title?: string;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({ required: false , description: 'tags=nodejs,nodejs'})
   @IsOptional()
   @IsString()
-  tags?: string[];
+  tags?: string;
 
   getQueryPostObject(): QueryPostProperty {
     const postQueryObject = {};
