@@ -97,10 +97,6 @@ export class PostService {
    * @returns Promise
    */
   async getPostByQuery(query: QueryPostProperty): Promise<Post[]> {
-    // const findOptions = {
-    //   ...plainToClass(QueryPostProperty, query).getQueryPostObject(),
-    //   relations: ['tags', 'author', 'comments'],
-    // };
     const qb = await this.postsRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.comments', 'comment')
@@ -123,12 +119,13 @@ export class PostService {
     if (query.author)
       qb.andWhere('post.author = :authorId', {authorId: query.author});
     if (query.title)
-      qb.andWhere('post.title LIKE :title', {title: '%title%'});
-    if (query.tags)
-      qb.andWhere('tag.name IN :tags', {tags: query.tags});
+      qb.andWhere('post.title LIKE :title', {title: `%${query.title}%`});
+    if (query.tags) {
+      // @ts-ignore 
+      qb.andWhere('tag.name IN (:tags)', {tags: query.tags.split(' ')});
+    }
     
     const posts = await qb.getMany();
-    // const posts = await this.postsRepository.find(findOptions);
     return posts.map((post) => new Post(post.toJSON()));
   }
 
