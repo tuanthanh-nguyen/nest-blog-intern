@@ -97,18 +97,18 @@ export class PostService {
    * @returns Promise
    */
   async getPostByQuery(query: QueryPostProperty): Promise<Post[]> {
+    // const commentsCount = await this.postsRepository
+    //   .createQueryBuilder('post')
+    //   .select('post.id', 'id')
+    //   .leftJoin('post.comments', 'post_comment')
+    //   .addSelect('Count(post_comment.id)', 'count')
+    //   .groupBy('id')
+    //   .getRawMany();
+    // console.log(commentsCount);
     const findOptions = {
       ...plainToClass(QueryPostProperty, query).getQueryPostObject(),
       relations: ['tags', 'author', 'comments'],
     };
-    const commentsCount = await this.postsRepository
-      .createQueryBuilder('post')
-      .select('post.id', 'id')
-      .leftJoin('post.comments', 'post_comment')
-      .addSelect('Count(post_comment.id)', 'count')
-      .groupBy('id')
-      .getRawMany();
-    console.log(commentsCount);
     const posts = await this.postsRepository.find(findOptions);
     return posts.map((post) => new Post(post.toJSON()));
   }
