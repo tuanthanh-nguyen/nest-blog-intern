@@ -122,23 +122,17 @@ export class PostService {
       qb.andWhere('post.title LIKE :title', {title: `%${query.title}%`});
     if (query.tags) {
       // @ts-ignore 
-      qb.andWhere('tag.name IN (:tags)', {tags: query.tags.split(',')});
-      // qb.andWhere(_ => {
-      //   const subQuery = this.postsRepository
-      //     .createQueryBuilder('post')
-      //     .leftJoinAndSelect('post.tags', 'tag')
-      //     .where('tag.name IN (:tags)', {tags: query.tags.split(',')})
-      //     .getQuery();
-      //   return 'post.id IN ' + subQuery;
-      // })
+      // qb.andWhere('tag.name IN (:tags)', {tags: query.tags.split(',')});
+      qb.andWhere(qb2 => {
+        const subQuery = qb2.subQuery() 
+          .select('post.id')
+          .from(Post, 'post')
+          .leftJoin('post.tags','tag')
+          .where('tag.name IN (:tags)', {tags: query.tags.split(',')})
+          .getQuery();
+        return 'post.id IN ' + subQuery;
+      })
     }
-
-        // const subQuery = await this.postsRepository
-        //   .createQueryBuilder('post')
-        //   .leftJoinAndSelect('post.tags', 'tag')
-        //   .where('tag.name IN (:tags)', {tags: query.tags.split(',')})
-        //   .getMany();
-        // console.log(subQuery)
     
     const posts = await qb.getMany();
     return posts.map((post) => new Post(post.toJSON()));
