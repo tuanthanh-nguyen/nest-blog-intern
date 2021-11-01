@@ -97,19 +97,38 @@ export class PostService {
    * @returns Promise
    */
   async getPostByQuery(query: QueryPostProperty): Promise<Post[]> {
-    // const commentsCount = await this.postsRepository
-    //   .createQueryBuilder('post')
-    //   .select('post.id', 'id')
-    //   .leftJoin('post.comments', 'post_comment')
-    //   .addSelect('Count(post_comment.id)', 'count')
-    //   .groupBy('id')
-    //   .getRawMany();
-    // console.log(commentsCount);
-    const findOptions = {
-      ...plainToClass(QueryPostProperty, query).getQueryPostObject(),
-      relations: ['tags', 'author', 'comments'],
-    };
-    const posts = await this.postsRepository.find(findOptions);
+    // const findOptions = {
+    //   ...plainToClass(QueryPostProperty, query).getQueryPostObject(),
+    //   relations: ['tags', 'author', 'comments'],
+    // };
+    const qb = await this.postsRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.comments', 'comment')
+      .leftJoinAndSelect('post.tags', 'tag')
+      .leftJoinAndSelect('comment.author', 'author')
+      .where('1=1');
+
+    const sortType = {
+      ['-1']: 'DESC',
+      ['1']: 'ASC'
+    }
+
+    if (query.limit && query.offset)
+      qb.skip(query.offset).take(query.limit);
+    if (query.fromDate)
+      qb.andWhere('createdAt > :fromDate', {fromDate: query.fromDate});
+    if (query.toDate)
+      qb.andWhere('createdAt < :toDate', {toDate: query.toDate});
+    qb.orderBy(query.sortField || 'post.id', sortType[query.sortType] || 'DESC')
+    if (query.author)
+      qb.andWhere('post.author = :authorId', {authorId: query.author});
+    if (query.title)
+      qb.andWhere('post.title LIKE :title', {title: '%title%'});
+    if (query.tags)
+      qb.andWhere('tag.name IN :tags', {tags: query.tags});
+    
+    const posts = await qb.getMany();
+    // const posts = await this.postsRepository.find(findOptions);
     return posts.map((post) => new Post(post.toJSON()));
   }
 

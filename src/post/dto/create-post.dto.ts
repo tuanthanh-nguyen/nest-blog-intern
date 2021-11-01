@@ -107,6 +107,11 @@ export class QueryPostProperty extends QueryCommon {
   @IsString()
   title?: string;
 
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  tags?: string[];
+
   getQueryPostObject(): QueryPostProperty {
     const postQueryObject = {};
     if (this.fromDate) postQueryObject['createdAt'] = MoreThan(this.fromDate);
